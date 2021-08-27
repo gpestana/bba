@@ -256,7 +256,12 @@ pub trait Cs<F: FftField> {
         (x2, y2)
     }
 
-    fn assert_add_group(&mut self, (x1, y1): (Var<F>, Var<F>), (x2, y2): (Var<F>, Var<F>), (x3, y3): (Var<F>, Var<F>)) {
+    fn assert_add_group(
+        &mut self,
+        (x1, y1): (Var<F>, Var<F>),
+        (x2, y2): (Var<F>, Var<F>),
+        (x3, y3): (Var<F>, Var<F>),
+    ) {
         let inv = self.var(|| (x2.val() - x1.val()).inverse().unwrap());
         self.gate(GateSpec {
             typ: GateType::Add,
@@ -277,7 +282,11 @@ pub trait Cs<F: FftField> {
         });
     }
 
-    fn add_group(&mut self, (x1, y1): (Var<F>, Var<F>), (x2, y2): (Var<F>, Var<F>)) -> (Var<F>, Var<F>) {
+    fn add_group(
+        &mut self,
+        (x1, y1): (Var<F>, Var<F>),
+        (x2, y2): (Var<F>, Var<F>),
+    ) -> (Var<F>, Var<F>) {
         let mut r = None;
         let x3 = self.var(|| {
             let pq = add_points((x1.val(), y1.val()), (x2.val(), y2.val()));

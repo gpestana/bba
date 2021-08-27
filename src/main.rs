@@ -63,12 +63,12 @@ fn main() {
     let fq_proof_system_constants = fq_constants();
 
     {
-        let args : Vec<_> = std::env::args().collect();
+        let args: Vec<_> = std::env::args().collect();
         if args.len() < 3 {
             println!("Usage: cargo run --release -- NUMBER_OF_ACCUMULATORS_TO_UPDATE COUNTERS_TO_UPDATE_PER_ACCUMULATOR")
         }
-        let accumulators_to_update : usize = args[1].parse().unwrap();
-        let updates_per_accumulator : u32 = args[2].parse().unwrap();
+        let accumulators_to_update: usize = args[1].parse().unwrap();
+        let updates_per_accumulator: u32 = args[2].parse().unwrap();
 
         let start = std::time::Instant::now();
         // Defining global parameters and performing one-time setup
@@ -197,11 +197,19 @@ fn main() {
         });
 
         // Then, the authority responds with an initial BBA.
-        let init_signature = time_batch("Authority: Verify and sign initial accumulator", "user", accumulators_to_update, || {
-            update_authority
-                .batch_init::<SpongeQ, SpongeR>(vec![init_request.clone(); accumulators_to_update])
-                .unwrap()[0]
-        });
+        let init_signature = time_batch(
+            "Authority: Verify and sign initial accumulator",
+            "user",
+            accumulators_to_update,
+            || {
+                update_authority
+                    .batch_init::<SpongeQ, SpongeR>(vec![
+                        init_request.clone();
+                        accumulators_to_update
+                    ])
+                    .unwrap()[0]
+            },
+        );
 
         let mut user =
             bba::User::<FpInner>::init(user_config, init_secrets, init_signature).unwrap();
@@ -213,17 +221,29 @@ fn main() {
                 delta: 10 * (i + 1),
             })
             .collect();
-        let update_request = time(&*format!("User:      Create BBA update request [{} counters updated]", updates_per_accumulator), || {
-            user.request_update::<SpongeQ, SpongeR>(updates)
-        });
+        let update_request = time(
+            &*format!(
+                "User:      Create BBA update request [{} counters updated]",
+                updates_per_accumulator
+            ),
+            || user.request_update::<SpongeQ, SpongeR>(updates),
+        );
 
         // and the authority can validate the unlinkable update request and provide an updated BBA
-        let resp = time_batch("Authority: Update BBA", "user", accumulators_to_update, || {
-            update_authority.perform_updates::<SpongeQ, SpongeR>(vec![update_request.clone(); accumulators_to_update])[0]
-                .as_ref()
-                .unwrap()
-                .clone()
-        });
+        let resp = time_batch(
+            "Authority: Update BBA",
+            "user",
+            accumulators_to_update,
+            || {
+                update_authority.perform_updates::<SpongeQ, SpongeR>(vec![
+                    update_request.clone();
+                    accumulators_to_update
+                ])[0]
+                    .as_ref()
+                    .unwrap()
+                    .clone()
+            },
+        );
         time("User:      Process update response", || {
             user.process_update_response(&update_request.updates, &resp)
         });
@@ -233,10 +253,22 @@ fn main() {
         let opening_size = bba::proof_size(&opening.proof);
         // Finally, we can verify the correctness of the opening
 
-        time_batch("Authority: Verify BBA", "user", accumulators_to_update, || {
-            bba::RewardOpening::verify_batch::<PSpongeQ, PSpongeR>(
-                &signer, &bba, brave_pubkey, &g_group_map, &open_vk, vec![&opening; accumulators_to_update])
-        }).unwrap();
+        time_batch(
+            "Authority: Verify BBA",
+            "user",
+            accumulators_to_update,
+            || {
+                bba::RewardOpening::verify_batch::<PSpongeQ, PSpongeR>(
+                    &signer,
+                    &bba,
+                    brave_pubkey,
+                    &g_group_map,
+                    &open_vk,
+                    vec![&opening; accumulators_to_update],
+                )
+            },
+        )
+        .unwrap();
 
         println!("------------------------------");
         println!(

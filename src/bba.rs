@@ -1,4 +1,3 @@
-use rayon::prelude::*;
 use crate::bba_init_proof;
 use crate::bba_open_proof;
 use crate::bba_update_proof;
@@ -18,7 +17,10 @@ use plonk_5_wires_protocol_dlog::{
     plonk_sponge::FrSponge,
     prover::ProverProof,
 };
+use rayon::prelude::*;
 use schnorr::SignatureParams;
+
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 #[derive(Clone)]
 pub struct Params<G: AffineCurve> {
@@ -137,11 +139,11 @@ pub struct UpdateAuthority<'a, G: schnorr::CoordinateCurve, Other: CommitmentCur
     pub signing_key: schnorr::PrivateKey<G>,
     pub signer: schnorr::Signer<G>,
     pub lgr_comms: Vec<G>,
-    pub update_vk: VerifierIndex<'a, Other>,
-    pub init_vk: VerifierIndex<'a, Other>,
     pub other_lgr_comms: Vec<PolyComm<Other>>,
     pub big_other_lgr_comms: Vec<PolyComm<Other>>,
     pub group_map: Other::Map,
+    pub init_vk: VerifierIndex<'a, Other>,
+    pub update_vk: VerifierIndex<'a, Other>,
 }
 
 pub struct UserProver<'a, G: CommitmentCurve, Other: CommitmentCurve> {
@@ -202,7 +204,7 @@ impl<C: proof_system::Cycle> RewardOpening<C> {
         authority_public_key: C::Inner,
         group_map: &C::InnerMap,
         vk: &VerifierIndex<'a, C::Inner>,
-        openings: Vec<&Self>
+        openings: Vec<&Self>,
     ) -> Result<(), String> {
         let lgr_comms: Vec<PolyComm<_>> = bba
             .lagrange_commitments
@@ -212,11 +214,11 @@ impl<C: proof_system::Cycle> RewardOpening<C> {
                 shifted: None,
             })
             .collect();
-        let batch : Vec<_> = openings.iter().map(|x| (vk, &lgr_comms, &x.proof)).collect();
-        match ProverProof::verify::<EFqSponge, EFrSponge>(
-            &group_map,
-            &batch
-        ) {
+        let batch: Vec<_> = openings
+            .iter()
+            .map(|x| (vk, &lgr_comms, &x.proof))
+            .collect();
+        match ProverProof::verify::<EFqSponge, EFrSponge>(&group_map, &batch) {
             Ok(true) => Ok(()),
             Ok(false) | Err(_) => Err("Open proof failed to verify"),
         }?;
@@ -620,21 +622,22 @@ where
             req.proof.public = vec![acc.0, acc.1];
         }
 
-        let batch : Vec<_> = reqs.iter().map(|r| (&self.init_vk, &self.big_other_lgr_comms, &r.proof)).collect();
+        let batch: Vec<_> = reqs
+            .iter()
+            .map(|r| (&self.init_vk, &self.big_other_lgr_comms, &r.proof))
+            .collect();
 
-        match ProverProof::verify::<EFqSponge, EFrSponge>(
-            &self.group_map,
-            &batch,
-        ) {
+        match ProverProof::verify::<EFqSponge, EFrSponge>(&self.group_map, &batch) {
             Ok(true) => Ok(()),
             Ok(false) | Err(_) => Err("Init proofs failed to verify"),
         }?;
-        let accs : Vec<_> = reqs.iter().map(|r| r.acc).collect();
+        let accs: Vec<_> = reqs.iter().map(|r| r.acc).collect();
         let signing_key = self.signing_key.clone();
         let signer = self.signer.clone();
-        let res : Vec<_> = accs.par_iter().map(|acc| {
-            signer.sign(signing_key, *acc)
-        }).collect();
+        let res: Vec<_> = accs
+            .par_iter()
+            .map(|acc| signer.sign(signing_key, *acc))
+            .collect();
         Ok(res)
     }
 
