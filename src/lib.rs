@@ -31,10 +31,10 @@ use groupmap::GroupMap;
 
 /// Initializes issuer
 pub fn init_issuer<'a>(
-    srs: commitment_dlog::srs::SRS<
+    srs: &'a commitment_dlog::srs::SRS<
         algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
     >,
-    big_srs: commitment_dlog::srs::SRS<
+    big_srs: &'a commitment_dlog::srs::SRS<
         algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
     >,
 ) -> bba::UpdateAuthority<
