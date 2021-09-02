@@ -135,6 +135,7 @@ pub struct UpdateResponse<G: AffineCurve> {
     signature: schnorr::Signature<G>,
 }
 
+#[derive(Clone)]
 pub struct UpdateAuthority<'a, G: schnorr::CoordinateCurve, Other: CommitmentCurve> {
     pub signing_key: schnorr::PrivateKey<G>,
     pub signer: schnorr::Signer<G>,
