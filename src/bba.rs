@@ -5,7 +5,10 @@ use crate::endo::EndoScalar;
 use crate::fft::lagrange_commitments;
 use crate::proof_system;
 use crate::schnorr;
-use algebra::{AffineCurve, PrimeField, ProjectiveCurve, UniformRand, VariableBaseMSM, Zero};
+use algebra::{
+    pasta::vesta::Affine, to_bytes, AffineCurve, PrimeField, ProjectiveCurve, UniformRand,
+    VariableBaseMSM, Zero,
+};
 use array_init::array_init;
 use commitment_dlog::{
     commitment::{CommitmentCurve, PolyComm},
@@ -20,13 +23,34 @@ use plonk_5_wires_protocol_dlog::{
 use rayon::prelude::*;
 use schnorr::SignatureParams;
 
-use serde::ser::{Serialize, SerializeStruct, Serializer};
+use algebra::ToBytes;
+use serde::de::{Deserialize as DeserializeTrait, Deserializer};
+use serde::ser::{Serialize as SerializeTrait, SerializeStruct, Serializer};
 
 #[derive(Clone)]
 pub struct Params<G: AffineCurve> {
     pub h: G,
     pub endo: G::ScalarField,
     pub lagrange_commitments: Vec<G>,
+}
+
+impl<G: AffineCurve> SerializeTrait for Params<G> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("Params", 3)?;
+        let h = to_bytes!(self.h).unwrap(); // TODO: change for unwrap_or()
+        state.serialize_field("h", &h);
+
+        let endo = to_bytes!(self.endo).unwrap(); // TODO: change for unwrap_or()
+        state.serialize_field("endo", &endo);
+
+        let comm = to_bytes!(self.lagrange_commitments).unwrap(); // TODO: change for unwrap_or()
+        state.serialize_field("lagrange_commitments", &comm);
+
+        state.end()
+    }
 }
 
 pub struct Randomized<G: AffineCurve> {
@@ -135,7 +159,7 @@ pub struct UpdateResponse<G: AffineCurve> {
     signature: schnorr::Signature<G>,
 }
 
-#[derive(Clone)]
+//#[derive(Clone)]
 pub struct UpdateAuthority<'a, G: schnorr::CoordinateCurve, Other: CommitmentCurve> {
     pub signing_key: schnorr::PrivateKey<G>,
     pub signer: schnorr::Signer<G>,

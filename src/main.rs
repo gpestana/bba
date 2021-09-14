@@ -5,7 +5,7 @@ use algebra::{
         pallas::{Affine as Other, PallasParameters},
         vesta::{Affine, VestaParameters},
     },
-    AffineCurve, ProjectiveCurve, UniformRand,
+    to_bytes, AffineCurve, ProjectiveCurve, UniformRand,
 };
 use array_init::array_init;
 use commitment_dlog::{
@@ -118,6 +118,7 @@ fn main() {
                 )
             },
         );
+
         let update_vk = update_pk.verifier_index();
 
         let open_params = bba_open_proof::Params {

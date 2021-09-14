@@ -1,13 +1,13 @@
 pub mod bba;
-mod bba_init_proof;
-mod bba_open_proof;
-mod bba_update_proof;
-mod endo;
-mod fft;
-mod proof_system;
-mod random_oracle;
-mod schnorr;
-mod util;
+pub mod bba_init_proof;
+pub mod bba_open_proof;
+pub mod bba_update_proof;
+pub mod endo;
+pub mod fft;
+pub mod proof_system;
+pub mod random_oracle;
+pub mod schnorr;
+pub mod util;
 
 use serde::Serialize;
 
@@ -49,12 +49,6 @@ pub fn init_issuer<'a>(
         endo: endo_r,
     };
 
-    // TODO:refactor init public key to factory? (i.e. trusted setup/ proof system)
-    //let () = SRS::<Affine>::create(1 << 11);
-
-    //let srs = SRS::<Affine>::create(1 << 11);
-    //let big_srs = SRS::<Affine>::create(1 << 12);
-
     let other_srs = SRS::<Other>::create(1 << ceil_log2(bba::MAX_COUNTERS));
     let group_map = <Affine as CommitmentCurve>::Map::setup();
     let g_group_map = <Other as CommitmentCurve>::Map::setup();
@@ -80,7 +74,6 @@ pub fn init_issuer<'a>(
         h,
     };
 
-    // TODO what?
     let group_map = <Affine as CommitmentCurve>::Map::setup();
 
     let init_params = bba_init_proof::Params {
@@ -141,6 +134,8 @@ pub fn init_issuer<'a>(
         update_vk,
     }
 }
+
+pub fn issue_bba() {}
 
 /// Returns version of the bba_scheme
 pub fn version() -> String {
