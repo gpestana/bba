@@ -97,7 +97,7 @@ pub struct SingleUpdate {
 // The request sent by a user to the server to get an initial BBA
 #[derive(Clone)]
 pub struct InitRequest<G: AffineCurve, Other: AffineCurve> {
-    acc: G,
+    pub acc: G,
     // A proof of:
     // I know r, c such that acc = r * H + c * L.
     // Could be replaced with a specialized schnorr proof for increased efficiency
