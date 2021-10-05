@@ -40,13 +40,13 @@ impl<G: AffineCurve> SerializeTrait for Params<G> {
     {
         let mut state = serializer.serialize_struct("Params", 3)?;
         let h = to_bytes!(self.h).unwrap(); // TODO: change for unwrap_or()
-        state.serialize_field("h", &h);
+        state.serialize_field("h", &h)?;
 
         let endo = to_bytes!(self.endo).unwrap(); // TODO: change for unwrap_or()
-        state.serialize_field("endo", &endo);
+        state.serialize_field("endo", &endo)?;
 
         let comm = to_bytes!(self.lagrange_commitments).unwrap(); // TODO: change for unwrap_or()
-        state.serialize_field("lagrange_commitments", &comm);
+        state.serialize_field("lagrange_commitments", &comm)?;
 
         state.end()
     }
