@@ -5,7 +5,7 @@ use algebra::{
         pallas::{Affine as Other, PallasParameters},
         vesta::{Affine, VestaParameters},
     },
-    to_bytes, AffineCurve, ProjectiveCurve, UniformRand,
+    AffineCurve, ProjectiveCurve, UniformRand,
 };
 use array_init::array_init;
 use commitment_dlog::{

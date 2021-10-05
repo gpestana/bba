@@ -9,14 +9,12 @@ pub mod random_oracle;
 pub mod schnorr;
 pub mod util;
 
-use serde::Serialize;
-
 use algebra::{
     pasta::{
         fp::Fp,
         fq::Fq,
-        pallas::{Affine as Other, PallasParameters},
-        vesta::{Affine, VestaParameters},
+        pallas::{Affine as Other},
+        vesta::Affine,
     },
     AffineCurve, ProjectiveCurve, UniformRand,
 };

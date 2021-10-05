@@ -6,7 +6,7 @@ use crate::fft::lagrange_commitments;
 use crate::proof_system;
 use crate::schnorr;
 use algebra::{
-    pasta::vesta::Affine, to_bytes, AffineCurve, PrimeField, ProjectiveCurve, UniformRand,
+    to_bytes, AffineCurve, PrimeField, ProjectiveCurve, UniformRand,
     VariableBaseMSM, Zero,
 };
 use array_init::array_init;
@@ -24,7 +24,6 @@ use rayon::prelude::*;
 use schnorr::SignatureParams;
 
 use algebra::ToBytes;
-use serde::de::{Deserialize as DeserializeTrait, Deserializer};
 use serde::ser::{Serialize as SerializeTrait, SerializeStruct, Serializer};
 
 #[derive(Clone)]
