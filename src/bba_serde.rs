@@ -40,9 +40,9 @@ impl<G: AffineCurve, Other: AffineCurve> Serialize for crate::bba::InitRequest<G
 
         // TODO: implement serilized/to_bytes for plonk_5_wires_protocol_dlog::prover::ProverProof
         //let proof = to_bytes!(self.proof).unwrap();
-        //let proof = bincode::serialize(&self.proof).unwrap();
 
-        //state.serialize_field("proof", &proof)?;
+        let proof = bincode::serialize(&self.proof).unwrap();
+        state.serialize_field("proof", &proof)?;
 
         state.end()
     }
