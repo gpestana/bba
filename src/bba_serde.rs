@@ -1,5 +1,57 @@
+use algebra::{to_bytes, ToBytes};
+
+use algebra::curves::AffineCurve;
+
+use serde::de::{Deserialize, Deserializer};
+use serde::ser::{Serialize, SerializeStruct, Serializer};
+
+impl<G: AffineCurve> Serialize for crate::bba::Params<G> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        // TODO: handle to_bytes!() unwraps
+
+        let mut state = serializer.serialize_struct("Params", 3)?;
+        let h = to_bytes!(self.h).unwrap();
+        state.serialize_field("h", &h)?;
+
+        let endo = to_bytes!(self.endo).unwrap();
+        state.serialize_field("endo", &endo)?;
+
+        let comm = to_bytes!(self.lagrange_commitments).unwrap();
+        state.serialize_field("lagrange_commitments", &comm)?;
+
+        state.end()
+    }
+}
+
+impl<G: AffineCurve, Other: AffineCurve> Serialize for crate::bba::InitRequest<G, Other> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        // TODO: handle to_bytes!() unwraps
+
+        let mut state = serializer.serialize_struct("InitRequest", 2)?;
+
+        let acc = to_bytes!(self.acc).unwrap();
+        state.serialize_field("acc", &acc)?;
+
+        // TODO: implement serilized/to_bytes for plonk_5_wires_protocol_dlog::prover::ProverProof
+        //let proof = to_bytes!(self.proof).unwrap();
+        //let proof = bincode::serialize(&self.proof).unwrap();
+
+        //state.serialize_field("proof", &proof)?;
+
+        state.end()
+    }
+}
+
 #[cfg(test)]
 mod test {
+    use super::*;
+
     use algebra::pasta::{
         fp::Fp,
         fq::Fq,
@@ -24,6 +76,12 @@ mod test {
 
         let init_secrets = crate::bba::init_secrets();
         let init_request = user_config.request_init::<SpongeQ, SpongeR>(init_secrets);
+
+        // serialize
+        let init_request_bytes = bincode::serialize(&init_request).unwrap();
+
+        // deserialize
+        //let init_request_decoded: crate::bba::InitRequest<algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>, algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>> = bincode::deserialize(&init_request_bytes[..]).unwrap();
 
         assert!(true);
     }

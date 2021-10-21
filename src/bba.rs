@@ -23,36 +23,11 @@ use plonk_5_wires_protocol_dlog::{
 use rayon::prelude::*;
 use schnorr::SignatureParams;
 
-use algebra::ToBytes;
-use serde::de::{Deserialize as DeserializeTrait, Deserializer};
-use serde::ser::{Serialize as SerializeTrait, SerializeStruct, Serializer};
-
-use serde::Serialize;
-
 #[derive(Clone)]
 pub struct Params<G: AffineCurve> {
     pub h: G,
     pub endo: G::ScalarField,
     pub lagrange_commitments: Vec<G>,
-}
-
-impl<G: AffineCurve> SerializeTrait for Params<G> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut state = serializer.serialize_struct("Params", 3)?;
-        let h = to_bytes!(self.h).unwrap(); // TODO: change for unwrap_or()
-        state.serialize_field("h", &h);
-
-        let endo = to_bytes!(self.endo).unwrap(); // TODO: change for unwrap_or()
-        state.serialize_field("endo", &endo);
-
-        let comm = to_bytes!(self.lagrange_commitments).unwrap(); // TODO: change for unwrap_or()
-        state.serialize_field("lagrange_commitments", &comm);
-
-        state.end()
-    }
 }
 
 pub struct Randomized<G: AffineCurve> {
@@ -97,7 +72,7 @@ pub struct SingleUpdate {
 }
 
 // The request sent by a user to the server to get an initial BBA
-#[derive(Clone, Serialize)]
+#[derive(Clone)]
 pub struct InitRequest<G: AffineCurve, Other: AffineCurve> {
     pub acc: G,
     // A proof of:
