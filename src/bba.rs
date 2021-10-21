@@ -27,6 +27,8 @@ use algebra::ToBytes;
 use serde::de::{Deserialize as DeserializeTrait, Deserializer};
 use serde::ser::{Serialize as SerializeTrait, SerializeStruct, Serializer};
 
+use serde::Serialize;
+
 #[derive(Clone)]
 pub struct Params<G: AffineCurve> {
     pub h: G,
@@ -95,9 +97,9 @@ pub struct SingleUpdate {
 }
 
 // The request sent by a user to the server to get an initial BBA
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct InitRequest<G: AffineCurve, Other: AffineCurve> {
-    acc: G,
+    pub acc: G,
     // A proof of:
     // I know r, c such that acc = r * H + c * L.
     // Could be replaced with a specialized schnorr proof for increased efficiency

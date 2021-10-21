@@ -29,6 +29,17 @@ use commitment_dlog::{
 
 use groupmap::GroupMap;
 
+use oracle::{
+    poseidon_5_wires::*,
+    sponge_5_wires::{DefaultFqSponge, DefaultFrSponge},
+};
+
+type SpongeQ = DefaultFqSponge<VestaParameters, PlonkSpongeConstants>;
+type SpongeR = DefaultFrSponge<Fp, PlonkSpongeConstants>;
+
+type PSpongeQ = DefaultFqSponge<PallasParameters, PlonkSpongeConstants>;
+type PSpongeR = DefaultFrSponge<Fq, PlonkSpongeConstants>;
+
 /// Initializes issuer
 pub fn init_issuer<'a>(
     srs: &'a commitment_dlog::srs::SRS<
@@ -135,7 +146,24 @@ pub fn init_issuer<'a>(
     }
 }
 
-pub fn issue_bba() {}
+fn init_sign<'a>(
+    authority: bba::UpdateAuthority<
+        'a,
+        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>,
+        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
+    >,
+    init_request: Vec<u8>,
+    acc: Vec<u8>,
+) -> Vec<u8> {
+    // deserialize init_request
+    // deserialize acc
+
+    //let init_signature = authority.batch_init::<SpongeQ, SpongeR>(
+    //    vec![init_request, acc]
+    //).unwrap()[0];
+
+    vec![]
+}
 
 /// Returns version of the bba_scheme
 pub fn version() -> String {
