@@ -10,16 +10,15 @@ impl<G: AffineCurve> Serialize for crate::bba::Params<G> {
     where
         S: Serializer,
     {
-        // TODO: handle to_bytes!() unwraps
-
         let mut state = serializer.serialize_struct("Params", 3)?;
-        let h = to_bytes!(self.h).unwrap();
+        let h = to_bytes!(self.h).map_err(serde::ser::Error::custom)?;
         state.serialize_field("h", &h)?;
 
-        let endo = to_bytes!(self.endo).unwrap();
+        let endo = to_bytes!(self.endo).map_err(serde::ser::Error::custom)?;
         state.serialize_field("endo", &endo)?;
 
-        let comm = to_bytes!(self.lagrange_commitments).unwrap();
+        let comm = to_bytes!(self.lagrange_commitments)
+            .map_err(serde::ser::Error::custom)?;
         state.serialize_field("lagrange_commitments", &comm)?;
 
         state.end()
@@ -31,17 +30,16 @@ impl<G: AffineCurve, Other: AffineCurve> Serialize for crate::bba::InitRequest<G
     where
         S: Serializer,
     {
-        // TODO: handle to_bytes!() unwraps
-
         let mut state = serializer.serialize_struct("InitRequest", 2)?;
 
-        let acc = to_bytes!(self.acc).unwrap();
+        let acc = to_bytes!(self.acc).map_err(serde::ser::Error::custom)?;
         state.serialize_field("acc", &acc)?;
 
         // TODO: implement serilized/to_bytes for plonk_5_wires_protocol_dlog::prover::ProverProof
-        //let proof = to_bytes!(self.proof).unwrap();
+        //let proof = to_bytes!(self.proof).map_err(serde::ser::Error::custom)?;
 
-        let proof = bincode::serialize(&self.proof).unwrap();
+        let proof = bincode::serialize(&self.proof)
+            .map_err(serde::ser::Error::custom)?;
         state.serialize_field("proof", &proof)?;
 
         state.end()
