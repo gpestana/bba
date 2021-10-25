@@ -6,7 +6,7 @@ use crate::fft::lagrange_commitments;
 use crate::proof_system;
 use crate::schnorr;
 use algebra::{
-    pasta::vesta::Affine, to_bytes, AffineCurve, PrimeField, ProjectiveCurve, UniformRand,
+    AffineCurve, PrimeField, ProjectiveCurve, UniformRand,
     VariableBaseMSM, Zero,
 };
 use array_init::array_init;

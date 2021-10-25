@@ -9,8 +9,6 @@ pub mod random_oracle;
 pub mod schnorr;
 pub mod util;
 
-use serde::Serialize;
-
 use algebra::{
     pasta::{
         fp::Fp,
@@ -34,6 +32,9 @@ use oracle::{
     sponge_5_wires::{DefaultFqSponge, DefaultFrSponge},
 };
 
+pub type GroupAffinePallas = algebra::short_weierstrass_jacobian::GroupAffine<PallasParameters>;
+pub type GroupAffineVesta = algebra::short_weierstrass_jacobian::GroupAffine<VestaParameters>;
+
 type SpongeQ = DefaultFqSponge<VestaParameters, PlonkSpongeConstants>;
 type SpongeR = DefaultFrSponge<Fp, PlonkSpongeConstants>;
 
@@ -42,17 +43,9 @@ type PSpongeR = DefaultFrSponge<Fq, PlonkSpongeConstants>;
 
 /// Initializes issuer
 pub fn init_issuer<'a>(
-    srs: &'a commitment_dlog::srs::SRS<
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
-    >,
-    big_srs: &'a commitment_dlog::srs::SRS<
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
-    >,
-) -> bba::UpdateAuthority<
-    'a,
-    algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>,
-    algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
-> {
+    srs: &'a commitment_dlog::srs::SRS<GroupAffineVesta>,
+    big_srs: &'a commitment_dlog::srs::SRS<GroupAffineVesta>,
+) -> bba::UpdateAuthority<'a, GroupAffinePallas, GroupAffineVesta> {
     // TODO: create factory for signer?
     let (_endo_q, endo_r) = endos::<Other>();
     let signer = schnorr::Signer::<Other> {
@@ -62,11 +55,9 @@ pub fn init_issuer<'a>(
 
     let other_srs = SRS::<Other>::create(1 << ceil_log2(bba::MAX_COUNTERS));
     let group_map = <Affine as CommitmentCurve>::Map::setup();
-    let g_group_map = <Other as CommitmentCurve>::Map::setup();
     let fq_poseidon = oracle::pasta::fq5::params();
 
     let proof_system_constants = proof_system::fp_constants();
-    let fq_proof_system_constants = proof_system::fq_constants();
 
     // TODO: refactor / as input?
     let brave_sk = <Other as AffineCurve>::ScalarField::rand(&mut rand_core::OsRng);
@@ -75,18 +66,6 @@ pub fn init_issuer<'a>(
         .into_affine();
 
     let bba = bba::Params::new(&other_srs, endo_r);
-    let init_params = bba_init_proof::Params {
-        lagrange_commitments: array_init(|i| bba.lagrange_commitments[i]),
-        h: other_srs.h,
-    };
-    let h = other_srs.h.to_coordinates().unwrap();
-    let update_params = bba_update_proof::Params {
-        brave_pubkey: brave_pubkey.to_coordinates().unwrap(),
-        h,
-    };
-
-    let group_map = <Affine as CommitmentCurve>::Map::setup();
-
     let init_params = bba_init_proof::Params {
         lagrange_commitments: array_init(|i| bba.lagrange_commitments[i]),
         h: other_srs.h,
@@ -101,6 +80,11 @@ pub fn init_issuer<'a>(
     );
     let init_vk = init_pk.verifier_index();
 
+    let h = other_srs.h.to_coordinates().unwrap();
+    let update_params = bba_update_proof::Params {
+        brave_pubkey: brave_pubkey.to_coordinates().unwrap(),
+        h,
+    };
     let update_pk = proof_system::generate_proving_key::<proof_system::FpInner, _>(
         &srs,
         &proof_system_constants,
@@ -147,11 +131,7 @@ pub fn init_issuer<'a>(
 }
 
 fn init_sign<'a>(
-    authority: bba::UpdateAuthority<
-        'a,
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>,
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
-    >,
+    authority: bba::UpdateAuthority<'a, GroupAffinePallas, GroupAffineVesta>,
     init_request: Vec<u8>,
     acc: Vec<u8>,
 ) -> Vec<u8> {
