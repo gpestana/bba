@@ -13,8 +13,8 @@ use algebra::{
     pasta::{
         fp::Fp,
         fq::Fq,
-        pallas::{Affine as Other},
-        vesta::Affine,
+        pallas::{Affine as Other, PallasParameters},
+        vesta::{Affine, VestaParameters},
     },
     AffineCurve, ProjectiveCurve, UniformRand,
 };
@@ -27,18 +27,25 @@ use commitment_dlog::{
 
 use groupmap::GroupMap;
 
-pub type GroupAffinePallas = algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>;
-pub type GroupAffineVesta = algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>;
+use oracle::{
+    poseidon_5_wires::*,
+    sponge_5_wires::{DefaultFqSponge, DefaultFrSponge},
+};
+
+pub type GroupAffinePallas = algebra::short_weierstrass_jacobian::GroupAffine<PallasParameters>;
+pub type GroupAffineVesta = algebra::short_weierstrass_jacobian::GroupAffine<VestaParameters>;
+
+type SpongeQ = DefaultFqSponge<VestaParameters, PlonkSpongeConstants>;
+type SpongeR = DefaultFrSponge<Fp, PlonkSpongeConstants>;
+
+type PSpongeQ = DefaultFqSponge<PallasParameters, PlonkSpongeConstants>;
+type PSpongeR = DefaultFrSponge<Fq, PlonkSpongeConstants>;
 
 /// Initializes issuer
 pub fn init_issuer<'a>(
     srs: &'a commitment_dlog::srs::SRS<GroupAffineVesta>,
     big_srs: &'a commitment_dlog::srs::SRS<GroupAffineVesta>,
-) -> bba::UpdateAuthority<
-    'a,
-    GroupAffinePallas,
-    GroupAffineVesta,
-> {
+) -> bba::UpdateAuthority<'a, GroupAffinePallas, GroupAffineVesta> {
     // TODO: create factory for signer?
     let (_endo_q, endo_r) = endos::<Other>();
     let signer = schnorr::Signer::<Other> {
@@ -132,7 +139,20 @@ pub fn init_issuer<'a>(
     }
 }
 
-pub fn issue_bba() {}
+fn init_sign<'a>(
+    authority: bba::UpdateAuthority<'a, GroupAffinePallas, GroupAffineVesta>,
+    init_request: Vec<u8>,
+    acc: Vec<u8>,
+) -> Vec<u8> {
+    // deserialize init_request
+    // deserialize acc
+
+    //let init_signature = authority.batch_init::<SpongeQ, SpongeR>(
+    //    vec![init_request, acc]
+    //).unwrap()[0];
+
+    vec![]
+}
 
 /// Returns version of the bba_scheme
 pub fn version() -> String {
