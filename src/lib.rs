@@ -55,11 +55,9 @@ pub fn init_issuer<'a>(
 
     let other_srs = SRS::<Other>::create(1 << ceil_log2(bba::MAX_COUNTERS));
     let group_map = <Affine as CommitmentCurve>::Map::setup();
-    let g_group_map = <Other as CommitmentCurve>::Map::setup();
     let fq_poseidon = oracle::pasta::fq5::params();
 
     let proof_system_constants = proof_system::fp_constants();
-    let fq_proof_system_constants = proof_system::fq_constants();
 
     // TODO: refactor / as input?
     let brave_sk = <Other as AffineCurve>::ScalarField::rand(&mut rand_core::OsRng);
@@ -68,18 +66,6 @@ pub fn init_issuer<'a>(
         .into_affine();
 
     let bba = bba::Params::new(&other_srs, endo_r);
-    let init_params = bba_init_proof::Params {
-        lagrange_commitments: array_init(|i| bba.lagrange_commitments[i]),
-        h: other_srs.h,
-    };
-    let h = other_srs.h.to_coordinates().unwrap();
-    let update_params = bba_update_proof::Params {
-        brave_pubkey: brave_pubkey.to_coordinates().unwrap(),
-        h,
-    };
-
-    let group_map = <Affine as CommitmentCurve>::Map::setup();
-
     let init_params = bba_init_proof::Params {
         lagrange_commitments: array_init(|i| bba.lagrange_commitments[i]),
         h: other_srs.h,
@@ -94,6 +80,11 @@ pub fn init_issuer<'a>(
     );
     let init_vk = init_pk.verifier_index();
 
+    let h = other_srs.h.to_coordinates().unwrap();
+    let update_params = bba_update_proof::Params {
+        brave_pubkey: brave_pubkey.to_coordinates().unwrap(),
+        h,
+    };
     let update_pk = proof_system::generate_proving_key::<proof_system::FpInner, _>(
         &srs,
         &proof_system_constants,
