@@ -1,4 +1,5 @@
 use algebra::{
+    short_weierstrass_jacobian::GroupAffine,
     pasta::{
         fp::Fp,
         fq::Fq,
@@ -288,26 +289,12 @@ fn main() {
 
 // initializes and returns a User and Verifier for testing purposes
 fn init_participants_test<'a>(
-    srs: &'a commitment_dlog::srs::SRS<
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
-    >,
-    other_srs: &'a commitment_dlog::srs::SRS<
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>,
-    >,
-    big_srs: &'a commitment_dlog::srs::SRS<
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
-    >,
+    srs: &'a SRS<GroupAffine<VestaParameters>>,
+    other_srs: &'a SRS<GroupAffine<PallasParameters>>,
+    big_srs: &'a SRS<GroupAffine<VestaParameters>>,
 ) -> (
-    bba::UserConfig<
-        'a,
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>,
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
-    >,
-    bba::UpdateAuthority<
-        'a,
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>,
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
-    >,
+    bba::UserConfig<'a, GroupAffine<PallasParameters>, GroupAffine<VestaParameters>>,
+    bba::UpdateAuthority<'a, GroupAffine<PallasParameters>, GroupAffine<VestaParameters>>,
 ) {
     let (_endo_q, endo_r) = endos::<Other>();
     let signer = Signer::<Other> {
@@ -321,10 +308,6 @@ fn init_participants_test<'a>(
         let s = signer.sign(k, m);
         assert!(signer.verify(pubkey, m, s));
     }
-
-    //let other_srs = SRS::<Other>::create(1 << ceil_log2(bba::MAX_COUNTERS));
-    //let srs = SRS::<Affine>::create(1 << 11);
-    //let big_srs = SRS::<Affine>::create(1 << 12);
 
     let group_map = <Affine as CommitmentCurve>::Map::setup();
     let g_group_map = <Other as CommitmentCurve>::Map::setup();

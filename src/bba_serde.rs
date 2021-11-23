@@ -52,12 +52,18 @@ impl<G: AffineCurve, Other: AffineCurve> Serialize for crate::bba::InitRequest<G
 mod test {
     use super::*;
 
+    use crate::bba::InitRequest;
+
     use algebra::pasta::{
         fp::Fp,
         fq::Fq,
         pallas::Affine as Other,
         vesta::{Affine, VestaParameters},
     };
+
+    use algebra::pasta::pallas::PallasParameters;
+    use algebra::short_weierstrass_jacobian::GroupAffine;
+
     use commitment_dlog::{commitment::ceil_log2, srs::SRS};
 
     use oracle::sponge_5_wires::{DefaultFqSponge, DefaultFrSponge};
@@ -81,7 +87,12 @@ mod test {
         let init_request_bytes = bincode::serialize(&init_request).unwrap();
 
         // deserialize
-        //let init_request_decoded: crate::bba::InitRequest<algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>, algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>> = bincode::deserialize(&init_request_bytes[..]).unwrap();
+        // ERR: the trait `serde::de::Deserialize<'_>` is not implemented for InitRequest<(...)>
+        // T: serde::de::Deserialize<'a> required by bound in bincode::deserialize
+        // let init_request_decoded: InitRequest<
+        //    GroupAffine<PallasParameters>,
+        //    GroupAffine<VestaParameters>,
+        // > = bincode::deserialize(&init_request_bytes[..]).unwrap();
 
         assert!(true);
     }
