@@ -9,8 +9,6 @@ pub mod random_oracle;
 pub mod schnorr;
 pub mod util;
 
-use serde::Serialize;
-
 use algebra::{
     pasta::{
         fp::Fp,
@@ -30,15 +28,15 @@ use commitment_dlog::{
 use groupmap::GroupMap;
 
 use oracle::{
-    poseidon_5_wires::*,
-    sponge_5_wires::{DefaultFqSponge, DefaultFrSponge},
+    poseidon::*,
+    sponge::{DefaultFqSponge, DefaultFrSponge},
 };
 
-type SpongeQ = DefaultFqSponge<VestaParameters, PlonkSpongeConstants>;
-type SpongeR = DefaultFrSponge<Fp, PlonkSpongeConstants>;
+type SpongeQ = DefaultFqSponge<VestaParameters, PlonkSpongeConstants5W>;
+type SpongeR = DefaultFrSponge<Fp, PlonkSpongeConstants5W>;
 
-type PSpongeQ = DefaultFqSponge<PallasParameters, PlonkSpongeConstants>;
-type PSpongeR = DefaultFrSponge<Fq, PlonkSpongeConstants>;
+type PSpongeQ = DefaultFqSponge<PallasParameters, PlonkSpongeConstants5W>;
+type PSpongeR = DefaultFrSponge<Fq, PlonkSpongeConstants5W>;
 
 /// Initializes issuer
 pub fn init_issuer<'a>(

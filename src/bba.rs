@@ -5,23 +5,22 @@ use crate::endo::EndoScalar;
 use crate::fft::lagrange_commitments;
 use crate::proof_system;
 use crate::schnorr;
-use algebra::{
-    pasta::vesta::Affine, to_bytes, AffineCurve, PrimeField, ProjectiveCurve, UniformRand,
-    VariableBaseMSM, Zero,
-};
+use algebra::{AffineCurve, PrimeField, ProjectiveCurve, UniformRand, VariableBaseMSM, Zero};
 use array_init::array_init;
 use commitment_dlog::{
     commitment::{CommitmentCurve, PolyComm},
     srs::SRS,
 };
 use oracle::FqSponge;
-use plonk_5_wires_protocol_dlog::{
+use plonk_protocol_dlog::{
     index::{Index, VerifierIndex},
     plonk_sponge::FrSponge,
     prover::ProverProof,
 };
 use rayon::prelude::*;
 use schnorr::SignatureParams;
+
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 
 #[derive(Clone)]
 pub struct Params<G: AffineCurve> {
@@ -93,7 +92,7 @@ pub struct UpdateRequest<G: AffineCurve, Other: AffineCurve> {
 
 // size in bytes
 pub fn proof_size<G: CommitmentCurve>(proof: &ProverProof<G>) -> usize {
-    fn poly_comm<A>(pc: &PolyComm<A>) -> usize {
+    fn poly_comm<A: CanonicalSerialize + CanonicalDeserialize>(pc: &PolyComm<A>) -> usize {
         match &pc.shifted {
             None => pc.unshifted.len(),
             Some(_) => 1 + pc.unshifted.len(),

@@ -1,11 +1,11 @@
 use algebra::{
-    short_weierstrass_jacobian::GroupAffine,
     pasta::{
         fp::Fp,
         fq::Fq,
         pallas::{Affine as Other, PallasParameters},
         vesta::{Affine, VestaParameters},
     },
+    short_weierstrass_jacobian::GroupAffine,
     to_bytes, AffineCurve, ProjectiveCurve, UniformRand,
 };
 
@@ -16,8 +16,8 @@ use commitment_dlog::{
 };
 use groupmap::GroupMap;
 use oracle::{
-    poseidon_5_wires::*,
-    sponge_5_wires::{DefaultFqSponge, DefaultFrSponge},
+    poseidon::*,
+    sponge::{DefaultFqSponge, DefaultFrSponge},
 };
 
 mod bba;

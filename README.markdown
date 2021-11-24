@@ -11,11 +11,10 @@ The major differences between that description and this implementation are
 
 ## Building and running
 
-1. Initialize submodules and install rust 1.45.2
+1. Initialize submodules and install rust ~1.45.2~ 1.56.0 
 
 ```
-git submodule update --init --recursive
-rustup default 1.45.2
+rustup default 1.56.0 
 ```
 
 2. Run
