@@ -1,13 +1,12 @@
-use algebra::{
-    pasta::{
-        fp::Fp,
-        fq::Fq,
-        pallas::{Affine as Other, PallasParameters},
-        vesta::{Affine, VestaParameters},
-    },
-    short_weierstrass_jacobian::GroupAffine,
-    to_bytes, AffineCurve, ProjectiveCurve, UniformRand,
+use mina_curves::pasta::{
+    fp::Fp,
+    fq::Fq,
+    pallas::{Affine as Other, PallasParameters},
+    vesta::{Affine, VestaParameters},
 };
+
+use ark_ec::{models::short_weierstrass_jacobian::GroupAffine, AffineCurve, ProjectiveCurve};
+use ark_ff::UniformRand;
 
 use array_init::array_init;
 use commitment_dlog::{
@@ -23,7 +22,6 @@ use oracle::{
 mod bba;
 mod bba_init_proof;
 mod bba_open_proof;
-mod bba_serde;
 mod bba_update_proof;
 mod endo;
 mod fft;

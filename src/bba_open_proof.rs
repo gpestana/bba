@@ -1,10 +1,13 @@
 use crate::bba;
 use crate::proof_system::*;
 use crate::schnorr;
-use algebra::{AffineCurve, FftField, PrimeField};
+//use algebra::{AffineCurve, FftField, PrimeField};
 use array_init::array_init;
 use plonk_circuits::gate::GateType;
 use schnorr::CoordinateCurve;
+
+use ark_ec::AffineCurve;
+use ark_ff::{FftField, PrimeField};
 
 // c, total value
 pub const PUBLIC_INPUT: usize = 2;

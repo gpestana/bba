@@ -9,15 +9,15 @@ pub mod random_oracle;
 pub mod schnorr;
 pub mod util;
 
-use algebra::{
-    pasta::{
-        fp::Fp,
-        fq::Fq,
-        pallas::{Affine as Other, PallasParameters},
-        vesta::{Affine, VestaParameters},
-    },
-    AffineCurve, ProjectiveCurve, UniformRand,
+use mina_curves::pasta::{
+    fp::Fp,
+    fq::Fq,
+    pallas::{Affine as Other, PallasParameters},
+    vesta::{Affine, VestaParameters},
 };
+
+use ark_ec::{AffineCurve, ProjectiveCurve};
+use ark_ff::UniformRand;
 
 use array_init::array_init;
 use commitment_dlog::{
@@ -41,15 +41,15 @@ type PSpongeR = DefaultFrSponge<Fq, PlonkSpongeConstants5W>;
 /// Initializes issuer
 pub fn init_issuer<'a>(
     srs: &'a commitment_dlog::srs::SRS<
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
+        ark_ec::short_weierstrass_jacobian::GroupAffine<mina_curves::pasta::vesta::VestaParameters>,
     >,
     big_srs: &'a commitment_dlog::srs::SRS<
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
+        ark_ec::short_weierstrass_jacobian::GroupAffine<mina_curves::pasta::vesta::VestaParameters>,
     >,
 ) -> bba::UpdateAuthority<
     'a,
-    algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>,
-    algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
+    ark_ec::short_weierstrass_jacobian::GroupAffine<mina_curves::pasta::pallas::PallasParameters>,
+    ark_ec::short_weierstrass_jacobian::GroupAffine<mina_curves::pasta::vesta::VestaParameters>,
 > {
     // TODO: create factory for signer?
     let (_endo_q, endo_r) = endos::<Other>();
@@ -147,8 +147,10 @@ pub fn init_issuer<'a>(
 fn init_sign<'a>(
     authority: bba::UpdateAuthority<
         'a,
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::pallas::PallasParameters>,
-        algebra::short_weierstrass_jacobian::GroupAffine<algebra::pasta::vesta::VestaParameters>,
+        ark_ec::short_weierstrass_jacobian::GroupAffine<
+            mina_curves::pasta::pallas::PallasParameters,
+        >,
+        ark_ec::short_weierstrass_jacobian::GroupAffine<mina_curves::pasta::vesta::VestaParameters>,
     >,
     init_request: Vec<u8>,
     acc: Vec<u8>,

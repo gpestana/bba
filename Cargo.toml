@@ -7,6 +7,7 @@ edition = "2021"
 [dependencies]
 oracle = { path = "./../proof-systems/oracle" }
 groupmap = { path = "./../proof-systems/groupmap" }
+mina-curves = { path = "./../proof-systems/curves" }
 algebra = { path = "./../zexe/algebra", features = [ "parallel", "pasta", "asm" ] }
 commitment_dlog = { path = "./../proof-systems/dlog/commitment" }
 plonk_protocol_dlog = { path = "./../proof-systems/dlog/plonk" }

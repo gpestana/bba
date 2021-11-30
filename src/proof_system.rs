@@ -1,9 +1,10 @@
 use crate::random_oracle;
-use algebra::{
-    pasta::{fp::Fp, fq::Fq, pallas::Affine as Other, vesta::Affine},
-    AffineCurve, BigInteger, FftField, Field, One, PrimeField, ProjectiveCurve, SquareRootField,
-    Zero,
-};
+
+use mina_curves::pasta::{fp::Fp, fq::Fq, pallas::Affine as Other, vesta::Affine};
+
+use ark_ec::{AffineCurve, ProjectiveCurve};
+use ark_ff::{biginteger::BigInteger, SquareRootField, Zero};
+
 use array_init::array_init;
 use commitment_dlog::{
     commitment::{ceil_log2, CommitmentCurve, PolyComm},
@@ -21,6 +22,8 @@ use plonk_protocol_dlog::{
     prover::ProverProof,
 };
 use std::collections::HashMap;
+
+use ark_ff::{FftField, Field, One, PrimeField};
 
 pub const COLUMNS: usize = 5;
 pub const ZK_ROWS: usize = 5;

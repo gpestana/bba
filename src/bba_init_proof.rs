@@ -1,7 +1,9 @@
 use crate::proof_system::*;
 use crate::schnorr;
-use algebra::{AffineCurve, FftField, PrimeField};
 use schnorr::CoordinateCurve;
+
+use ark_ec::AffineCurve;
+use ark_ff::{FftField, PrimeField};
 
 // Proof spec:
 // Public input:

@@ -1,4 +1,3 @@
-use algebra::{AffineCurve, BigInteger, PrimeField, ProjectiveCurve, UniformRand, Zero};
 use array_init::array_init;
 use commitment_dlog::commitment::CommitmentCurve;
 use oracle::poseidon::ArithmeticSpongeParams;
@@ -7,6 +6,9 @@ use oracle::poseidon::sbox;
 use oracle::poseidon::PlonkSpongeConstants5W;
 
 use crate::{endo, random_oracle};
+
+use ark_ec::{AffineCurve, ProjectiveCurve};
+use ark_ff::{biginteger::BigInteger, PrimeField, UniformRand, Zero};
 
 pub trait CoordinateCurve: AffineCurve {
     fn to_coords(&self) -> Option<(Self::BaseField, Self::BaseField)>;

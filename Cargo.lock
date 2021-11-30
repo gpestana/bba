@@ -198,6 +198,7 @@ dependencies = [
  "commitment_dlog",
  "ff-fft",
  "groupmap",
+ "mina-curves",
  "oracle",
  "plonk_circuits",
  "plonk_protocol_dlog",
